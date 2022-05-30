@@ -1,20 +1,109 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Blank
+      To Do Tasks
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+  
+  <ion-header translucent>
     <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
+      <ion-title>Reorder</ion-title>
+      <ion-buttons slot="primary">
+        <ion-button onclick="toggleReorder()">Toggle</ion-button>
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <ion-modal [isOpen]="isModalOpen"
+  [breakpoints]="[0.1, 0.5, 1]"
+  [initialBreakpoint]="0.5">
+    <ng-template>
+      <div id="container">
+        <ion-item>
+          <ion-label>Title</ion-label>
+          <ion-input placeholder="Something.." type="text" [(ngModel)]="title" ></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Time</ion-label>
+          <ion-input placeholder="1" type="number" [(ngModel)]="time" ></ion-input>
+          <ion-label>h</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>Description</ion-label>
+          <ion-input placeholder="Some Description" type="text" [(ngModel)]="description" ></ion-input>
+        </ion-item>
+        <ion-button (click)="Add()" style="margin-top: 50px;" color="success" >Add</ion-button>
+        <ion-button (click)="HideModal()" style="margin-top: 50px;" color="danger" >Close</ion-button>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="ShowModal()" >
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-card>
+    <ion-item>
+      <ion-icon color="success" name="checkmark-done-circle-outline" slot="start"></ion-icon>
+      <ion-label>{{totalDonetime}}h Done</ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-icon color="warning" name="checkmark-done-circle-outline" slot="start"></ion-icon>
+      <ion-label>{{totalInProgresstime}}h In Progress</ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-icon color="primary" name="checkmark-done-circle-outline" slot="start"></ion-icon>
+      <ion-label>{{totalToDotime}}h To Do</ion-label>
+    </ion-item>
+  
+    <ion-card-content>
+      in this section, you can see an overview of the work ahead..
+    </ion-card-content>
+  </ion-card>
+
+  <ion-list>
+    <ion-reorder-group>
+      <ion-reorder *ngIf="(showList == true)" >
+      
+        <ion-item *ngFor='let task of tasks'>
+        
+          <ion-label>
+            <ion-text>
+              <h1>{{task.Title}}</h1>
+              <h2>{{task.Time}} h</h2>
+              <h3>{{task.Description}}</h3>
+            </ion-text>
+          </ion-label>
+        
+          <ion-button (click)="ChangeStatus(task.Id)" 
+                      id={{task.Id.toString()}}
+                      fill="outline"
+                      style="width: 100px;" >{{GetTaskStatus(task.Id)}}</ion-button>
+        
+          <ion-button color="secondary" fill="outline" (click)="Edit(task)" >Edit</ion-button>
+        
+          <ion-button (click)="Delete(task.Id)" color="danger" fill="outline">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        
+        </ion-item>
+      
+      </ion-reorder>
+    </ion-reorder-group>
+  </ion-list>
 </ion-content>
+
+<script>
+  function toggleReorder() {
+    const reorderGroup = document.getElementById('reorder');
+    reorderGroup.disabled = !reorderGroup.disabled;
+    reorderGroup.addEventListener('ionItemReorder', ({ detail }) => {
+      detail.complete(true);
+    });
+  }
+</script>
